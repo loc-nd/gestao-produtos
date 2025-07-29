@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 public class ProdutoController {
 
@@ -32,6 +35,13 @@ public class ProdutoController {
 
     @GetMapping("/produtos")
     public ResponseEntity<List<ProdutoEntity>> listarProdutos() {
+        List<ProdutoEntity> produtosList = produtoRepository.findAll();
+        if(!produtosList.isEmpty()){
+            for(ProdutoEntity produto : produtosList){
+                UUID id = produto.getIdProduto();
+                produto.add(linkTo(methodOn(ProdutoController.class).listarProdutoPorId(id)).withSelfRel());
+            }
+        }
         return ResponseEntity.status(HttpStatus.OK).body(produtoRepository.findAll());
     }
 
@@ -66,6 +76,7 @@ public class ProdutoController {
         if(produtoEntity0.isEmpty()){
             return ResponseEntity.status(HttpStatus.OK).body("Produto não encontrado");
         }
+        produtoRepository.delete(produtoEntity0.get());
         return ResponseEntity.status(HttpStatus.OK).body("Produto deletado com sucesso");
     }
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "TB_PRODUTOS")
-public class ProdutoEntity implements Serializable {
+public class ProdutoEntity extends RepresentationModel<ProdutoEntity> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -13,7 +13,7 @@ public interface ProdutoService {
 
     List<ProdutoEntity> listarTodos();
 
-    Optional<ProdutoEntity> listarPorId(UUID id);
+    ProdutoEntity listarPorId(UUID id);
 
     ProdutoEntity atualizar(UUID uuid, ProdutoRecordDTO produtoRecordDTO);
 

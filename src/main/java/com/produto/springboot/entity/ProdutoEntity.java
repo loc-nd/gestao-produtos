@@ -1,6 +1,8 @@
 package com.produto.springboot.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +28,9 @@ public class ProdutoEntity extends RepresentationModel<ProdutoEntity> implements
     private BigDecimal preco;
     private String descricao;
     private String categoria;
+    @Column(unique = true, nullable = false, length = 13)
+    @Size(min = 13, max = 13, message = "O ISBN tem de conter 13 dígitos")
+    @Pattern(regexp = "\\d{13}", message = "O ISBN deve conter apenas números")
     private String isbn;
 
 }

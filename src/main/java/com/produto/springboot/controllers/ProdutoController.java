@@ -3,6 +3,7 @@ package com.produto.springboot.controllers;
 import com.produto.springboot.dtos.ProdutoRecordDTO;
 import com.produto.springboot.entity.ProdutoEntity;
 import com.produto.springboot.repositories.ProdutoRepository;
+import com.produto.springboot.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,64 +21,46 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class ProdutoController {
 
-    @Autowired
-    ProdutoRepository produtoRepository;
 
+    @Autowired
+    private ProdutoService produtoService;
 
 
     @PostMapping("/produtos")
     public ResponseEntity<ProdutoEntity> salvarProduto(@RequestBody @Valid ProdutoRecordDTO produtoRecordDTO) {
-        ProdutoEntity produtoEntity = new ProdutoEntity();
-        BeanUtils.copyProperties(produtoRecordDTO, produtoEntity);
-        return new ResponseEntity<>(produtoRepository.save(produtoEntity), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.salvar(produtoRecordDTO));
     }
 
 
     @GetMapping("/produtos")
     public ResponseEntity<List<ProdutoEntity>> listarProdutos() {
-        List<ProdutoEntity> produtosList = produtoRepository.findAll();
-        if(!produtosList.isEmpty()){
-            for(ProdutoEntity produto : produtosList){
-                UUID id = produto.getIdProduto();
-                produto.add(linkTo(methodOn(ProdutoController.class).listarProdutoPorId(id)).withSelfRel());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(produtoRepository.findAll());
+        List<ProdutoEntity> produtos = produtoService.listarTodos();
+
+        produtos.forEach(produto -> produto
+                .add(linkTo(methodOn(ProdutoController.class)
+                        .listarProdutoPorId(produto.getIdProduto())).withSelfRel()));
+        return ResponseEntity.ok(produtos);
     }
 
 
     @GetMapping("/produtos/{id}")
-    public ResponseEntity<Object> listarProdutoPorId(@PathVariable(value="id") UUID id) {
-        Optional<ProdutoEntity> produtoEntity = produtoRepository.findById(id);
-        if(produtoEntity.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(produtoEntity.get());
+    public ResponseEntity<Object> listarProdutoPorId(@PathVariable(value = "id") UUID id) {
+        return ResponseEntity.ok(produtoService.listarPorId(id));
     }
 
 
     @PutMapping("/produtos/{id}")
-    public ResponseEntity<Object> atualizarProduto(@PathVariable(value="id") UUID id,
+    public ResponseEntity<Object> atualizarProduto(@PathVariable(value = "id") UUID id,
                                                    @RequestBody @Valid ProdutoRecordDTO produtoRecordDTO) {
-        Optional<ProdutoEntity> produtoEntity0 = produtoRepository.findById(id);
-        if(produtoEntity0.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
-        }
-        var produtoEntity = produtoEntity0.get();
-        BeanUtils.copyProperties(produtoRecordDTO, produtoEntity);
-        return ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produtoEntity));
+        return ResponseEntity.ok(produtoService.atualizar(id, produtoRecordDTO));
 
     }
 
 
     @DeleteMapping("/produtos/{id}")
-    public ResponseEntity<Object> deletarProduto(@PathVariable(value="id") UUID id) {
-        Optional<ProdutoEntity> produtoEntity0 = produtoRepository.findById(id);
-        if(produtoEntity0.isEmpty()){
-            return ResponseEntity.status(HttpStatus.OK).body("Produto não encontrado");
-        }
-        produtoRepository.delete(produtoEntity0.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Produto deletado com sucesso");
+    public ResponseEntity<Object> deletarProduto(@PathVariable(value = "id") UUID id) {
+        produtoService.deletar(id);
+        return ResponseEntity.ok("Produto deletado com sucesso");
     }
 
 }

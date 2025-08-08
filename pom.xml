@@ -8,11 +8,11 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.produto</groupId>
-	<artifactId>springboot</artifactId>
+	<groupId>com.gestao-produtos</groupId>
+	<artifactId>gestao-produtos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>springboot</name>
-	<description>Demo project for Spring Boot</description>
+	<name>gestao-produtos</name>
+	<description>API de gerenciamento de produtos</description>
 	<url/>
 	<licenses>
 		<license/>

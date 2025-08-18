@@ -3,6 +3,7 @@ package com.produto.springboot.service;
 import com.produto.springboot.dtos.ProdutoRecordDTO;
 import com.produto.springboot.entity.ProdutoEntity;
 import com.produto.springboot.exception.BusinessException;
+import com.produto.springboot.exception.ProdutoNaoEncontradoException;
 import com.produto.springboot.repositories.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,5 +101,39 @@ class ProdutoServiceImplTest {
 
         assertNotNull(produtoEncontrado);
         assertEquals(produtoEntity.getIdProduto(), produtoEncontrado.getIdProduto());
+    }
+
+    @Test
+    void listarPorId_DeveLancarExcecaoQuandoNaoExiste() {
+        UUID idInexistente = UUID.randomUUID();
+        when(produtoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        assertThrows(ProdutoNaoEncontradoException.class, () -> produtoService.listarPorId(idInexistente));
+
+    }
+
+    @Test
+    void deveAtualizarProduto(){
+        UUID id = UUID.randomUUID();
+        when(produtoRepository.findById(id)).thenReturn(Optional.of(produtoEntity));
+        when(produtoRepository.save(any(ProdutoEntity.class))).thenReturn(produtoEntity);
+
+        ProdutoEntity produtoAtualizado = produtoService.listarPorId(id);
+
+        assertNotNull(produtoAtualizado);
+        assertEquals(produtoRecordDTO.nome(), produtoAtualizado.getNome());
+        assertEquals(produtoRecordDTO.isbn(), produtoAtualizado.getIsbn());
+        assertEquals(produtoRecordDTO.preco(), produtoAtualizado.getPreco());
+        assertEquals(produtoRecordDTO.descricao(), produtoAtualizado.getDescricao());
+        assertEquals(produtoRecordDTO.categoria(), produtoAtualizado.getCategoria());
+    }
+
+    @Test
+    void deveExcluirPorId(){
+        UUID id = UUID.randomUUID();
+
+        produtoService.deletar(id);
+
+        verify(produtoRepository, times(1)).deleteById(id);
     }
 }

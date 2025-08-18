@@ -15,6 +15,7 @@ public interface ProdutoService {
 
     ProdutoEntity listarPorId(UUID id);
 
+
     ProdutoEntity atualizar(UUID uuid, ProdutoRecordDTO produtoRecordDTO);
 
     void deletar(UUID id);

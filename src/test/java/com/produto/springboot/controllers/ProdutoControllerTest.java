@@ -54,13 +54,13 @@ class ProdutoControllerTest {
 
         produtoEntity = new ProdutoEntity();
         produtoEntity.setIdProduto(produtoId);
-        produtoEntity.setNome("Livro");
+        produtoEntity.setNome("Livro Testes Unitários");
         produtoEntity.setDescricao("JUnit Tests");
         produtoEntity.setCategoria("Livros");
         produtoEntity.setIsbn("123456");
 
         produtoRecordDTO = new ProdutoRecordDTO(
-                "Livro",
+                "Livro Testes Unitários",
                 BigDecimal.valueOf(109.90),
                 "JUnit Tests",
                 "Livros",
@@ -98,7 +98,7 @@ class ProdutoControllerTest {
 
         mockMvc.perform(get("/produtos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nome").value("Livro"))
+                .andExpect(jsonPath("$[0].nome").value("Livro Testes Unitários"))
                 .andExpect(jsonPath("$[0].isbn").value("123456"));
 
     }
@@ -109,7 +109,7 @@ class ProdutoControllerTest {
 
         mockMvc.perform(get("/produtos/{id}", produtoId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nome").value("Livro"));
+                .andExpect(jsonPath("$.nome").value("Livro Testes Unitários"));
 
     }
 

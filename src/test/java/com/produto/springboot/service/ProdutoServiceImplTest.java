@@ -40,14 +40,14 @@ class ProdutoServiceImplTest {
 
         produtoEntity = new ProdutoEntity();
         ReflectionTestUtils.setField(produtoEntity, "idProduto", UUID.randomUUID());
-        produtoEntity.setNome("Livro");
+        produtoEntity.setNome("Livro Testes Unitários");
         produtoEntity.setPreco(BigDecimal.valueOf(109.90));
         produtoEntity.setDescricao("Junit tests");
         produtoEntity.setCategoria("Livros");
         produtoEntity.setIsbn("12345");
 
         produtoRecordDTO = new ProdutoRecordDTO(
-                "Livro",
+                "Livro Testes Unitários",
                 BigDecimal.valueOf(109.90),
                 "Junit tests",
                 "Livros",
@@ -90,7 +90,7 @@ class ProdutoServiceImplTest {
         List<ProdutoEntity> produtos = produtoService.listarTodos();
 
         assertEquals(1, produtos.size());
-        assertEquals("Livro", produtos.get(0).getNome());
+        assertEquals("Livro Testes Unitários", produtos.get(0).getNome());
     }
 
     @Test

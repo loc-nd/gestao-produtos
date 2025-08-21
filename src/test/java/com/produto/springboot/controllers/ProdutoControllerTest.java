@@ -89,7 +89,8 @@ class ProdutoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(produtoRecordDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Já existe um produto com este nome"));
+                .andExpect(jsonPath("$.message").value("Já existe um produto com este nome"))
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
@@ -120,7 +121,8 @@ class ProdutoControllerTest {
 
         mockMvc.perform(get("/produtos/{id}", produtoId))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Produto nao encontrado"));
+                .andExpect(jsonPath("$.message").value("Produto nao encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
 
     }
 
@@ -140,7 +142,6 @@ class ProdutoControllerTest {
         Mockito.doNothing().when(produtoService).deletar(eq(produtoId));
 
         mockMvc.perform(delete("/produtos/{id}", produtoId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Produto deletado com sucesso"));
+                .andExpect(status().isNoContent());
     }
 }

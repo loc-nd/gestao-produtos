@@ -15,29 +15,36 @@ class GlobalExceptionHandlerTest {
     void deveRetornarNotFoundQuandoProdutoNaoEncontrado() {
         ProdutoNaoEncontradoException exception = new ProdutoNaoEncontradoException("Produto nao encontrado");
 
-        ResponseEntity<String> response = globalExceptionHandler.handleProdutoNaoEncontrado(exception);
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleProdutoNaoEncontrado(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody()).isEqualTo("Produto nao encontrado");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Produto nao encontrado");
+        assertThat(response.getBody().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+
     }
 
     @Test
     void deveRetornarBadRequestQuandoBusinessException() {
         BusinessException exception = new BusinessException("Erro de negócio");
 
-        ResponseEntity<String> response = globalExceptionHandler.handlerBusinessException(exception);
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handlerBusinessException(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Erro de negócio");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Erro de negócio");
+        assertThat(response.getBody().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     void deveRetornarInternalServerErrorQuandoExceptionGenerica(){
         Exception exception = new Exception("Erro inesperado na aplicação");
 
-        ResponseEntity<String> response = globalExceptionHandler.handleException(exception);
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleException(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody()).isEqualTo("Erro inesperado na aplicação");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Erro inesperado na aplicação");
+        assertThat(response.getBody().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }

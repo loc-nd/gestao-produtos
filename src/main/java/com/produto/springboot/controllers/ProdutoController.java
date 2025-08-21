@@ -2,8 +2,15 @@ package com.produto.springboot.controllers;
 
 import com.produto.springboot.dtos.ProdutoRecordDTO;
 import com.produto.springboot.entity.ProdutoEntity;
+import com.produto.springboot.exception.ErrorResponse;
 import com.produto.springboot.repositories.ProdutoRepository;
 import com.produto.springboot.service.ProdutoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +32,33 @@ public class ProdutoController {
     @Autowired
     private ProdutoService produtoService;
 
-
+    @Operation(summary = "Cria um novo produto.",
+            description = "Adiciona um novo produto a base de dados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Inserção de produto realizada com sucesso.",
+            content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
+            @ApiResponse(responseCode = "400", description = "Erro na inserção do produto.",
+            content =  @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
     @PostMapping("/produtos")
     public ResponseEntity<ProdutoEntity> salvarProduto(@RequestBody @Valid ProdutoRecordDTO produtoRecordDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.salvar(produtoRecordDTO));
     }
 
 
+
+
+
+    @Operation(summary = "Lista todos os produtos.",
+            description = "Realiza uma listagem de todos os produtos da base de dados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso.",
+            content = @Content(array = @ArraySchema(schema =  @Schema(implementation = ProdutoEntity.class)))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
     @GetMapping("/produtos")
     public ResponseEntity<List<ProdutoEntity>> listarProdutos() {
         List<ProdutoEntity> produtos = produtoService.listarTodos();
@@ -43,24 +70,60 @@ public class ProdutoController {
     }
 
 
+
+
+    @Operation(summary = "Lista produtos por id",
+            description = "Realiza uma busca por id de um produto específico da base de dados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso.",
+            content =  @Content(schema = @Schema(implementation = ProdutoEntity.class))),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
     @GetMapping("/produtos/{id}")
     public ResponseEntity<Object> listarProdutoPorId(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.ok(produtoService.listarPorId(id));
     }
 
 
+
+
+
+    @Operation(summary = "Atualiza produtos",
+             description = "Realiza a atualização de um produto específico da base de dados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Atualização realizada com sucesso.",
+            content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
+            @ApiResponse(responseCode = "400", description = "Erro na atualização do produto.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
     @PutMapping("/produtos/{id}")
     public ResponseEntity<Object> atualizarProduto(@PathVariable(value = "id") UUID id,
                                                    @RequestBody @Valid ProdutoRecordDTO produtoRecordDTO) {
         return ResponseEntity.ok(produtoService.atualizar(id, produtoRecordDTO));
-
     }
 
 
+
+
+
+    @Operation(summary = "Deleta produtos",
+            description = "Realiza deleção de um produto específico da base de dados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Produto deletado com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Erro na deleção do produto."),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+    })
     @DeleteMapping("/produtos/{id}")
     public ResponseEntity<Object> deletarProduto(@PathVariable(value = "id") UUID id) {
         produtoService.deletar(id);
-        return ResponseEntity.ok("Produto deletado com sucesso");
+        return ResponseEntity.noContent().build();
     }
 
 }

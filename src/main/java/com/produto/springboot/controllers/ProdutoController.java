@@ -8,6 +8,7 @@ import com.produto.springboot.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -33,14 +34,16 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @Operation(summary = "Cria um novo produto.",
-            description = "Adiciona um novo produto a base de dados.")
+            description = "Adiciona um novo produto à base de dados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Inserção de produto realizada com sucesso.",
-            content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
+                    content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
             @ApiResponse(responseCode = "400", description = "Erro na inserção do produto.",
-            content =  @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Já existe um produto com este nome\", \"status\": 400, \"timestamp\": \"2025-08-22T13:10:00\" }"))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Erro inesperado na aplicação\", \"status\": 500, \"timestamp\": \"2025-08-22T13:10:00\" }")))
     })
     @PostMapping("/produtos")
     public ResponseEntity<ProdutoEntity> salvarProduto(@RequestBody @Valid ProdutoRecordDTO produtoRecordDTO) {
@@ -55,9 +58,10 @@ public class ProdutoController {
             description = "Realiza uma listagem de todos os produtos da base de dados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso.",
-            content = @Content(array = @ArraySchema(schema =  @Schema(implementation = ProdutoEntity.class)))),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProdutoEntity.class)))),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Erro inesperado na aplicação\", \"status\": 500, \"timestamp\": \"2025-08-22T13:10:00\" }")))
     })
     @GetMapping("/produtos")
     public ResponseEntity<List<ProdutoEntity>> listarProdutos() {
@@ -76,11 +80,13 @@ public class ProdutoController {
             description = "Realiza uma busca por id de um produto específico da base de dados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso.",
-            content =  @Content(schema = @Schema(implementation = ProdutoEntity.class))),
+                    content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
             @ApiResponse(responseCode = "404", description = "Produto não encontrado.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Produto não encontrado\", \"status\": 404, \"timestamp\": \"2025-08-22T13:10:00\" }"))),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Erro inesperado na aplicação\", \"status\": 500, \"timestamp\": \"2025-08-22T13:10:00\" }")))
     })
     @GetMapping("/produtos/{id}")
     public ResponseEntity<Object> listarProdutoPorId(@PathVariable(value = "id") UUID id) {
@@ -92,16 +98,16 @@ public class ProdutoController {
 
 
     @Operation(summary = "Atualiza produtos",
-             description = "Realiza a atualização de um produto específico da base de dados.")
+            description = "Realiza a atualização de um produto específico da base de dados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Atualização realizada com sucesso.",
-            content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
-            @ApiResponse(responseCode = "400", description = "Erro na atualização do produto.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Produto não encontrado",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ProdutoEntity.class))),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Produto não encontrado\", \"status\": 404, \"timestamp\": \"2025-08-22T13:10:00\" }"))),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Erro inesperado na aplicação\", \"status\": 500, \"timestamp\": \"2025-08-22T13:10:00\" }")))
     })
     @PutMapping("/produtos/{id}")
     public ResponseEntity<Object> atualizarProduto(@PathVariable(value = "id") UUID id,
@@ -114,11 +120,15 @@ public class ProdutoController {
 
 
     @Operation(summary = "Deleta produtos",
-            description = "Realiza deleção de um produto específico da base de dados.")
+            description = "Realiza a deleção de um produto específico da base de dados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Produto deletado com sucesso."),
-            @ApiResponse(responseCode = "400", description = "Erro na deleção do produto."),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Produto não encontrado\", \"status\": 404, \"timestamp\": \"2025-08-22T13:10:00\" }"))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{ \"message\": \"Erro inesperado na aplicação\", \"status\": 500, \"timestamp\": \"2025-08-22T13:10:00\" }")))
     })
     @DeleteMapping("/produtos/{id}")
     public ResponseEntity<Object> deletarProduto(@PathVariable(value = "id") UUID id) {
